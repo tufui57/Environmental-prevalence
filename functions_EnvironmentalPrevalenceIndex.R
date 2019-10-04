@@ -246,6 +246,14 @@ calc_EP <- function(
   outlierPercent = 0
 ){
   
+  ###################################################################################### 
+  ### Check missing values in data1 and data2
+  ###################################################################################### 
+  # The data cannot have missing values for EP calculation.
+  
+  data1 <- data1[complete.cases(data1), ]
+  data2 <- data2[complete.cases(data2), ]
+  
   
   ########################################################################################### 
   # Check if the use of ordination axes instead of climate variables makes differnce in EP.
