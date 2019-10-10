@@ -354,5 +354,7 @@ calc_EP <- function(
     print(paste("finished the cell number", i))
   }
   
-  return(ep)
+  ep.d <- cbind(data1[, coordinateNames], unlist(ep))
+  
+  return(ep.d)
 }

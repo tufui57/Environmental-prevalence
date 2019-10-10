@@ -4,7 +4,6 @@
 
 library(ggplot2)
 library(gridExtra)
-library(extrafont)
 library(grid)
 library(raster)
 library(rgdal)
