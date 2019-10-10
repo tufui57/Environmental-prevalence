@@ -251,8 +251,8 @@ calc_EP <- function(
   ###################################################################################### 
   # The data cannot have missing values for EP calculation.
   
-  data1 <- data1[complete.cases(data1), ]
-  data2 <- data2[complete.cases(data2), ]
+  data1 <- data1[complete.cases(data1[, c(coordinateNames, climateNames)]), ]
+  data2 <- data2[complete.cases(data2[, c(coordinateNames, climateNames)]), ]
   
   
   ########################################################################################### 
@@ -354,7 +354,9 @@ calc_EP <- function(
     print(paste("finished the cell number", i))
   }
   
-  ep.d <- cbind(data1[, coordinateNames], unlist(ep))
+  # Combine climate data (data1) with EP
+  ep.d <- cbind(data1[, c(coordinateNames, climateNames)], unlist(ep))
+  colnames(ep.i)[ncol(ep.i)] <- "EP"
   
   return(ep.d)
 }

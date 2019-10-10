@@ -2,7 +2,7 @@
 ### Calculate Environmental Prevalence Index (EP)
 ###################################################################################################
 
-source(".\\EP\\functions_EnvironmentalPrevalenceIndex.R")
+source(".\\GitHub\\Environmental-prevalence\\functions_EnvironmentalPrevalenceIndex.R")
 
 
 ##########################################################################
@@ -11,8 +11,7 @@ source(".\\EP\\functions_EnvironmentalPrevalenceIndex.R")
 
 ### Load current cliamte data at 5km resolution
 load(".\\Scores_Acaena_landcover5km.data")
-climateNames <- c("bioclim1", "bioclim6", "bioclim12", "bioclim15")
-
+climateNames <- c("bioclim1", "bioclim6", "bioclim12")
 
 ### EP within Whole NZ
 ep.i <- calc_EP(data1 = scores,
@@ -20,7 +19,13 @@ ep.i <- calc_EP(data1 = scores,
                   climateNames = climateNames,
                   coordinateNames = c("x","y")
                   )
-save(ep.i, file = "EPcc_NZ_4var.data")
+save(ep.i, file = "EPcc_NZ_3var.data")
+
+### Check the map of EP
+colnames(ep.i)[ncol(ep.i)] <- "EP"
+ggplot(ep.i) +
+  geom_raster(aes_string(x = "x", y = "y", fill="EP"))
+
 
 ### EP within i km neighbourhood
 for(n in c(20,50,100
