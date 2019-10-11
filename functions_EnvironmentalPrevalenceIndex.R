@@ -35,12 +35,12 @@ get_radius_size <- function(dat, # data.frame
 ######################################################################################
 
 analogousCells_in_single_variable <- function(p, # a target grid cell
-                                             dat2, # grid cells to search analogous climates for.
+                                             data2, # grid cells to search analogous climates for.
                                              a1, # climate variable range
                                              climateName # column name of climate variable
 ){
-  # Identify grid cells of dat2 with the following condition; (p- a1) <= dat2 <= (p + a1)
-  dat.plus <- dat2[(dat2[, climateName] <= (p[, climateName] + a1)), ]
+  # Identify grid cells of data2 with the following condition; (p- a1) <= data2 <= (p + a1)
+  dat.plus <- data2[(data2[, climateName] <= (p[, climateName] + a1)), ]
   dat.plus.minus <- dat.plus[(dat.plus[, climateName] >= (p[, climateName] - a1)), ]
   
   return(dat.plus.minus)
@@ -52,7 +52,7 @@ analogousCells_in_single_variable <- function(p, # a target grid cell
 ###################################################################################################
 
 analogousCells_in_mult_variables <- function(p, # a target grid cell
-                                             dat2, # grid cells to search analogous climates for.
+                                             data2, # grid cells to search analogous climates for.
                                              ranges, # result of get_radius_size()
                                              climateNames # column name of climate variable
 ){
@@ -64,7 +64,7 @@ analogousCells_in_mult_variables <- function(p, # a target grid cell
     neighbours <- list()
     
     # Get cells within (j -1)*10 % neighbourhood of variable 1
-    neighbours[[1]] <- analogousCells_in_single_variable(p, dat2,
+    neighbours[[1]] <- analogousCells_in_single_variable(p, data2,
                                                         a1 = ranges[[1]][j], 
                                                         climateNames[1])
     for(i in 1:(length(climateNames)-1)){
@@ -85,7 +85,7 @@ analogousCells_in_mult_variables <- function(p, # a target grid cell
 # sapply(neighbours.size, nrow)
 # 
 # # Plot the grid cells with analogous conditions on the graph of all grid cells
-# plot(dat2[, climateNames[1:2]])
+# plot(data2[, climateNames[1:2]])
 # points(neighbours.size[[2]][, climateNames[1:2]], col="lightblue")
 # points(neighbours.size[[3]][, climateNames[1:2]], col="green")
 # points(neighbours.size[[11]][, climateNames[1:2]], col="pink")
@@ -136,20 +136,28 @@ auc <-
 # EP of the time at the time (e.g. EP of the current climate at the current time)
 
 EP <- function(p, # a target grid cell
-                dat2, # grid cells to search analogous climates for.
+                data2, # grid cells to search analogous climates for.
                 ranges, # result of get_radius_size()
                 climateNames # column name of climate variable
 ){
   
-  neighbours.size <- analogousCells_in_mult_variables(
-    p, dat2, ranges, climateNames
+  if(length(climateNames) == 1){
+    neighbours.size <- analogousCells_in_single_variable(
+      p, data2, ranges, climateNames
+    )
+    
+  }else{
+      neighbours.size <- analogousCells_in_mult_variables(
+    p, data2, ranges, climateNames
   )
+  }
+
   
   # Calculate percentage of area within the neighbourhood over NZ
   ratio <- lapply(2:length(ranges[[1]]),
                   function(j){
                     # Find points of a group within neighbourhood of another group of points 
-                    nrow(neighbours.size[[j]]) / nrow(dat2)
+                    nrow(neighbours.size[[j]]) / nrow(data2)
                   }
   )
   
