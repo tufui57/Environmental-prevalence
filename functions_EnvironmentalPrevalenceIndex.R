@@ -356,7 +356,7 @@ calc_EP <- function(
   
   # Combine climate data (data1) with EP
   ep.d <- cbind(data1[, c(coordinateNames, climateNames)], unlist(ep))
-  colnames(ep.i)[ncol(ep.i)] <- "EP"
+  colnames(ep.d)[ncol(ep.d)] <- "EP"
   
   return(ep.d)
 }

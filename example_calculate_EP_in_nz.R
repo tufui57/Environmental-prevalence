@@ -22,7 +22,6 @@ ep.i <- calc_EP(data1 = scores,
 save(ep.i, file = "EPcc_NZ_3var.data")
 
 ### Check the map of EP
-colnames(ep.i)[ncol(ep.i)] <- "EP"
 ggplot(ep.i) +
   geom_raster(aes_string(x = "x", y = "y", fill="EP"))
 
