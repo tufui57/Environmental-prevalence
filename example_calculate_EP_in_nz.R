@@ -37,7 +37,7 @@ for(n in c(20,50,100
                     neighbourhood.size = n
                     )
   # Save
-  save(ep.i, file = paste("EP_5km_currentInCurrent_", n,"kmNeighbourhood.data", sep=""))
+  save(ep.i, file = paste("EPcc_5km_", n,"kmNeighbourhood.data", sep=""))
   
 }
 
@@ -69,7 +69,7 @@ for(i in c(20,50,100)){
                     neighbourhood.size = i
   )
   # Save
-  save(ep.i, file = paste("EP_5km_LGMInLGM_", i,"kmNeighbourhood.data", sep=""))
+  save(ep.i, file = paste("EPll_5km_", i,"kmNeighbourhood.data", sep=""))
   
 }
 
@@ -92,7 +92,7 @@ ep.i <- calc_EP(scores,
                   climateNames,
                   coordinateNames = c("x","y")
                   )
-save(ep.i, file = "EPcl_NZ_4var22sep2019.data")
+save(ep.i, file = "EPcl_NZ_4var.data")
 
 ### EPcl within i km neighbourhood
 for(i in c(20,50,100)){

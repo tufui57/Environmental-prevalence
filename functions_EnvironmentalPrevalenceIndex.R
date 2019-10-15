@@ -2,6 +2,8 @@
 ### Environmental Prevalence Index (EP) 
 ######################################################################################
 
+# This file was created and modified by Miki Nomura.
+
 ### Steps for the EP calculation
 # 1. Prepare a x a km2 neighbourhood square for a target grid cell. 
 # For the cells along coastlines, the neighbourhood can overlap with the sea.
@@ -17,9 +19,9 @@
 # Breadth of environmental variable * 0, 10%, ..., 90%, 100%
 ######################################################################################
 
-get_radius_size <- function(dat, # data.frame
+get_range_breadth <- function(dat, # data.frame
                             climateName, # a column name of climate variable
-                            climateRangeStep = 10 # Integer. Percentage of climate range breaths.
+                            climateRangeStep = 10 # Integer. Percentage of climate range breadths.
                             ){
   
   # NOTE; the 100% range breath MUST cover the total range of climate variables.
@@ -35,10 +37,10 @@ get_radius_size <- function(dat, # data.frame
 ######################################################################################
 
 analogousCells_in_single_range <- function(p, # a target grid cell
-                                             data2, # grid cells to search analogous climates for.
-                                             a1, # a range of climate variable or coordinate 
-                                             climateName # column name of climate variable
-){
+                                           data2, # grid cells to search analogous climates for.
+                                           a1, # a range of climate variable or coordinate 
+                                           climateName # column name of climate variable
+                                           ){
   # Identify grid cells of data2 which meet the following condition; (p- a1) <= data2 <= (p + a1)
   dat.plus <- data2[(data2[, climateName] <= (p[, climateName] + a1)), ]
   dat.plus.minus <- dat.plus[(dat.plus[, climateName] >= (p[, climateName] - a1)), ]
@@ -52,10 +54,10 @@ analogousCells_in_single_range <- function(p, # a target grid cell
 ###################################################################################################
 
 analogousCells_in_multi_ranges <- function(p, # a target grid cell
-                                             data2, # grid cells to search analogous climates for.
-                                             ranges, # result of get_radius_size()
-                                             climateNames # column name of climate variable
-){
+                                           data2, # grid cells to search analogous climates for.
+                                           ranges, # result of get_range_breadth()
+                                           climateNames # column name of climate variable
+                                           ){
   
   ### If just one variable is given 
   if(length(climateNames) == 1){
@@ -155,10 +157,10 @@ auc <-
 # EP of the time at the time (e.g. EP of the current climate at the current time)
 
 EP <- function(p, # a target grid cell
-                data2, # grid cells to search analogous climates for.
-                ranges, # result of get_radius_size()
-                climateNames # column name of climate variable
-){
+               data2, # grid cells to search analogous climates for.
+               ranges, # result of get_range_breadth()
+               climateNames # column name of climate variable
+               ){
   
   neighbours.size <- analogousCells_in_multi_ranges(
     p, data2, ranges, climateNames
@@ -250,6 +252,7 @@ check_outliers <- function(p, # one row data.frame of target grid cell
 ##################################################################################################
 ### Calculate EP of current climate in the current climate at 5km resolution
 ###################################################################################################
+library(schoolmath)
 
 calc_EP <- function(
   data1, # data.frame containing data of grid cells to calcualte EP for.
@@ -257,22 +260,33 @@ calc_EP <- function(
   climateNames, # Vector. Column names of environmental variables to search for analogous environment conditions
   coordinateNames, # Vector with two elements. Column names of coodinate in data1 & data2
   climateRangeStep = 10, # Integer. Breaks of cliamte range breaths.
-  neighbourhood.size = NULL, # Size of neighbourhood area to search analogous climates (km)
-  # Unit of NZTM is meter. This function might need an option for data whose coordinate unit is degree.
+  neighbourhood.size = NULL, # Size of neighbourhood area to search analogous climates. 
+                             # neighbourhood.size corresponds to length of one side of square and must be given in km.
   standardize = F, # Standardize climate data
   ordination = F, # use of ordination axes instead of climate variables
   outlierRemoval = F, # remove climate outliers from data to search analogous climates from.
   outlierPercent = 0
-){
+
+  ){
   
   ###################################################################################### 
   ### Check missing values in data1 and data2
   ###################################################################################### 
   # The data cannot have missing values for EP calculation.
   
+  if(any(is.na(data1[, climateNames]))){
+    warning('EP cannot be calcualted for grid cells with NA values. \nThe returned data frame does not have those grid cells.')
+  }
   data1 <- data1[complete.cases(data1[, c(coordinateNames, climateNames)]), ]
   data2 <- data2[complete.cases(data2[, c(coordinateNames, climateNames)]), ]
   
+  ##########################################################################################################################
+  ### Show Warning messages, if the unit of neighbourhood area seems different from the units of coordinates
+  ########################################################################################################################## 
+  
+  if(any(is.decimal(data1[, coordinateNames[1]])) && is.null(neighbourhood.size) == FALSE ){
+    warning('Units of your coordinates might not be kilo meter. \nIf so, the returned EP values are wrong. \nConvert your coordinates into km and re-run.')
+  }
   
   ########################################################################################### 
   # Check if the use of ordination axes instead of climate variables makes differnce in EP.
@@ -324,7 +338,7 @@ calc_EP <- function(
         neighbour.window <- data2
       }
       
-      ranges <- lapply(climateNames, get_radius_size, dat = neighbour.window)
+      ranges <- lapply(climateNames, get_range_breadth, dat = neighbour.window)
       names(ranges) <- climateNames
       
     }else{
@@ -338,7 +352,7 @@ calc_EP <- function(
         # To get a set of climate range breadths, combine cells of data1 and data2 within the neighbourhood
         neighbour.window.data2_p <- rbind(neighbour.window[c(coordinateNames, climateNames)], 
                                           p[c(coordinateNames, climateNames)])
-        ranges <- lapply(climateNames, get_radius_size, dat = neighbour.window.data2_p)
+        ranges <- lapply(climateNames, get_range_breadth, dat = neighbour.window.data2_p)
         names(ranges) <- climateNames
       
 
@@ -353,7 +367,7 @@ calc_EP <- function(
         # To get a set of climate range breadths, combine cells within the neighbourhood and the target point.
         neighbour.window.data2_p <- rbind(neighbour.window[c(coordinateNames, climateNames)], 
                                           p[c(coordinateNames, climateNames)])
-        ranges <- lapply(climateNames, get_radius_size, dat = neighbour.window.data2_p)
+        ranges <- lapply(climateNames, get_range_breadth, dat = neighbour.window.data2_p)
         names(ranges) <- climateNames
       }
       
@@ -366,7 +380,7 @@ calc_EP <- function(
     ###################################################################################### 
     ep[i] <- EP(p, # a target grid cell
                   neighbour.window, # grid cells within the neighbourhood
-                  ranges, # result of get_radius_size() or ranges_without_outliers()
+                  ranges, # result of get_range_breadth() or ranges_without_outliers()
                   climateNames # column names of climate variables
     )
     
