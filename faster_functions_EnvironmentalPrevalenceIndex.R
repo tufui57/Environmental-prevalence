@@ -1,8 +1,20 @@
 ##################################################################################################
 ### Try to make faster function for EP calculation
 ###################################################################################################
+### Testing the modified function
 
+### Load climate data
+load(".\\Scores_Acaena_landcover5km.data")
+load(".\\Scores_LGM_mainisland_worldclim1_5km.data")
+
+climateNames <- c("bioclim1", "bioclim6", "bioclim12", "bioclim15")
+
+source(".\\GitHub\\Environmental-prevalence\\modified_basic_functions_EP.R")
 library(schoolmath)
+
+##################################################################################################
+### Calculate EP of current climate in the current time within whole target areas
+###################################################################################################
 
 calc_EPcc_within_whole_target_areas <- function(
   data1, # data.frame containing data of grid cells to calcualte EP for.
@@ -60,11 +72,6 @@ calc_EPcc_within_whole_target_areas <- function(
 }
 
 
-### Testing the modified function
-load(".\\Scores_Acaena_landcover5km.data")
-climateNames <- c("bioclim1", "bioclim6", "bioclim12", "bioclim15")
-
-source(".\\GitHub\\Environmental-prevalence\\functions_EnvironmentalPrevalenceIndex.R")
 
 
 system.time(
@@ -73,9 +80,8 @@ system.time(
                   coordinateNames = c("x","y")
   )
 )
-# user  system elapsed 
-# 8.20    0.08    8.37
 
+# execute time for 10279 rows in scores usinf 4 variables; 1760.89 sec = app.29.3min
 
 system.time(
   test2 <- calc_EP(data1 = scores, data2 = scores,
@@ -84,10 +90,7 @@ system.time(
   )
 )
 
-# user  system elapsed 
-# 9.73    0.04    9.80
-
-
+# 1853.45sec = 30.9min
 
 ##################################################################################################
 ### Calculate EP of current climate in the past within whole target areas
@@ -157,11 +160,6 @@ calc_EPcl_within_whole_target_areas <- function(
 
 
 
-### Load climate data
-load(".\\Scores_Acaena_landcover5km.data")
-load(".\\Scores_LGM_mainisland_worldclim1_5km.data")
-colnames(scores.lgm) <- gsub("bi","bioclim", colnames(scores.lgm))
-climateNames <- c("bioclim1", "bioclim6", "bioclim12", "bioclim15") 
 
 system.time(
   test <- calc_EPcl_within_whole_target_areas(data1 = scores[1:300,],
