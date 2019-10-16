@@ -2,36 +2,52 @@
 ### Calculate Environmental Prevalence Index (EP)
 ###################################################################################################
 
-source(".\\GitHub\\Environmental-prevalence\\functions_EnvironmentalPrevalenceIndex.R")
+source(".\\Environmental-prevalence\\faster_functions_EnvironmentalPrevalenceIndex.R")
+source(".\\Environmental-prevalence\\functions_EnvironmentalPrevalenceIndex.R")
+
+library(schoolmath)
+library(doFuture)
+library(foreach)
+library(plyr)
+
+### Setup for multi-core use
+registerDoFuture()  ## tells foreach futures should be used
+plan(multisession)  ## specifies what type of futures
+
+### Load climate data
+load("Y:\\Scores_Acaena_landcover5km.data")
+load("Y:\\Scores_LGM_mainisland_worldclim1_5km.data")
+
+climateNames <- c("bioclim1", "bioclim6", "bioclim12", "bioclim15")
 
 
 ##########################################################################
 ###### EP of current climates under current conditions; EPcc
 ###########################################################################
 
-### Load current cliamte data at 5km resolution
-load(".\\Scores_Acaena_landcover5km.data")
-climateNames <- c("bioclim1", "bioclim6", "bioclim12")
-
 ### EP within Whole NZ
-ep.i <- calc_EP(data1 = scores,
-                  data2 = scores,
+ep.i <- multicore_calc_EPcc_within_whole_target_areas(data1 = scores,
                   climateNames = climateNames,
                   coordinateNames = c("x","y")
                   )
-save(ep.i, file = "EPcc_NZ_3var.data")
+save(ep.i, file = "EPcc_NZ_4var_test.data")
 
-### Check the map of EP
-ggplot(ep.i) +
-  geom_raster(aes_string(x = "x", y = "y", fill="EP"))
+### Check this EP is identical to those the previous EP function generated.
+# Load SAI values
+load("EPcc_NZ_4var.data")
+sai <- load("EPcc_NZ_4var.data")
+sai <- get(sai)
+load("EPcc_NZ_4var_test.data")
+sai2 <- load("EPcc_NZ_4var_test.data")
+sai2 <- get(sai2)
 
+identical(unlist(sai), sai2$EP)
 
 ### EP within i km neighbourhood
 for(n in c(20,50,100
            )){
   
-  ep.i <- calc_EP(data1 = scores,
-                    data2 = scores,
+  ep.i <- multicore_calc_EPcc_within_neighbourhood_areas(data1 = scores,
                     climateNames = climateNames,
                     coordinateNames = c("x","y"),
                     neighbourhood.size = n
@@ -51,8 +67,7 @@ load(".\\Scores_LGM_mainisland_worldclim1_5km.data")
 climateNames <- c("bi1", "bi6", "bi12", "bi15")
 
 # EP within Whole NZ
-ep.i <- calc_EP(scores.lgm, 
-                  scores.lgm, 
+ep.i <- multicore_calc_EPcc_within_whole_target_areas(scores.lgm, 
                   climateNames,
                   coordinateNames = c("x","y")
                   )
@@ -62,8 +77,7 @@ save(ep.i, file = "EPll_4var.data")
 # EP within i km neighbourhood
 for(i in c(20,50,100)){
   ### i km neighbourhood window
-  ep.i <- calc_EP(scores.lgm,
-                    scores.lgm,
+  ep.i <- multicore_calc_EPcc_within_neighbourhood_areas(scores.lgm,
                     climateNames = climateNames,
                     coordinateNames = c("x","y"),
                     neighbourhood.size = i
@@ -87,7 +101,7 @@ climateNames <- c("bioclim1", "bioclim6", "bioclim12", "bioclim15")
 
 
 ### EPcl within Whole NZ
-ep.i <- calc_EP(scores,
+ep.i <- multicore_calc_EPcl_within_whole_target_areas(scores,
                   scores.lgm,
                   climateNames,
                   coordinateNames = c("x","y")
@@ -97,7 +111,7 @@ save(ep.i, file = "EPcl_NZ_4var.data")
 ### EPcl within i km neighbourhood
 for(i in c(20,50,100)){
   
-  ep.i <- calc_EP(data1 = scores,
+  ep.i <- multicore_calc_EPcl_within_neighbourhood_areas(data1 = scores,
                   data2 = scores.lgm,
                   climateNames = climateNames,
                   coordinateNames = c("x","y"),
