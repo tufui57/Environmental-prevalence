@@ -32,16 +32,6 @@ ep.i <- multicore_calc_EPcc_within_whole_target_areas(data1 = scores,
                   )
 save(ep.i, file = "EPcc_NZ_4var_test.data")
 
-### Check this EP is identical to those the previous EP function generated.
-# Load SAI values
-load("EPcc_NZ_4var.data")
-sai <- load("EPcc_NZ_4var.data")
-sai <- get(sai)
-load("EPcc_NZ_4var_test.data")
-sai2 <- load("EPcc_NZ_4var_test.data")
-sai2 <- get(sai2)
-
-identical(unlist(sai), sai2$EP)
 
 ### EP within i km neighbourhood
 for(n in c(20,50,100
