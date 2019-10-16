@@ -130,9 +130,6 @@ multicore_calc_EPcl_within_whole_target_areas <- function(
   return(ep.d)
 }
 
-
-
-
 ##################################################################################################
 ### Calculate EP of current climate in the past within user-defined neighbourhood areas
 ###################################################################################################
@@ -173,12 +170,14 @@ multicore_calc_EPcl_within_neighbourhood_areas <- function(
     ######################################################################################
     # Prepare the neighbourhood square of the target cell
     ######################################################################################
+    #### Prepare a neighbourhood square to search analogous climate from.
     # IF neighbourhood.size = 20 (km), the radius of the neighbourhood square, "a", is 10000 m (= 10km = 20km/2)
-    dat.x <- analogousCells_in_single_range(data1[i, ], data2, neighbourhood.size * 1000 / 2, coordinateNames[1])
-    neighbour.window <- analogousCells_in_single_range(data1[i, ], dat.x, neighbourhood.size * 1000 / 2, coordinateNames[2])
+    #a <- neighbourhood.size * 1000 / 2
+    dat.x <- analogousCells_in_single_range(data1[i,], data2, (neighbourhood.size * 1000 / 2), coordinateNames[1])
+    neighbour.window <- analogousCells_in_single_range(data1[i,], dat.x, (neighbourhood.size * 1000 / 2), coordinateNames[2])
     
     # To get a set of climate range breadths, combine cells within the neighbourhood and the target point.
-    neighbour.window.data2_p <- rbind(neighbour.window[c(coordinateNames, climateNames)], 
+    neighbour.window.data2_p <- rbind(neighbour.window[, c(coordinateNames, climateNames)], 
                                       data1[i, c(coordinateNames, climateNames)])
     ranges <- lapply(climateNames, get_range_breadth, dat = neighbour.window.data2_p)
     names(ranges) <- climateNames
@@ -188,7 +187,7 @@ multicore_calc_EPcl_within_neighbourhood_areas <- function(
     ###################################################################################### 
     return(
       EP(data1[i, ], # a target grid cell
-         data2, # grid cells within the neighbourhood
+         neighbour.window, # grid cells within the neighbourhood
          ranges, # result of get_range_breadth() or ranges_without_outliers()
          climateNames # column names of climate variables
       )
@@ -202,9 +201,6 @@ multicore_calc_EPcl_within_neighbourhood_areas <- function(
   
   return(ep.d)
 }
-
-
-
 
 ##################################################################################################
 ### Calculate EP of current climate in the current time within user-defined neighbourhood areas
@@ -282,3 +278,4 @@ multicore_calc_EPcc_within_neighbourhood_areas <- function(
     return(ep.d)
   }
   
+
