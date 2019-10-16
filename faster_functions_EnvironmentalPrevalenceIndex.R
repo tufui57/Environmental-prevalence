@@ -25,14 +25,7 @@ multicore_calc_EPcc_within_whole_target_areas <- function(
   }
   data1 <- data1[complete.cases(data1[, c(coordinateNames, climateNames)]), ]
   
-  ##########################################################################################################################
-  ### Show Warning messages, if the unit of neighbourhood area seems different from the units of coordinates
-  ########################################################################################################################## 
-  
-  if(any(is.decimal(data1[, coordinateNames[1]])) && is.null(neighbourhood.size) == FALSE ){
-    warning('Units of your coordinates might not be kilo meter. \nIf so, the returned EP values are wrong. \nConvert your coordinates into km and re-run.')
-  }
-  
+
   ###################################################################################### 
   ### Calculate EP
   ###################################################################################### 
@@ -88,14 +81,7 @@ multicore_calc_EPcl_within_whole_target_areas <- function(
   data1 <- data1[complete.cases(data1[, c(coordinateNames, climateNames)]), ]
   data2 <- data2[complete.cases(data2[, c(coordinateNames, climateNames)]), ]
   
-  ##########################################################################################################################
-  ### Show Warning messages, if the unit of neighbourhood area seems different from the units of coordinates
-  ########################################################################################################################## 
-  
-  if(any(is.decimal(data1[, coordinateNames[1]])) && is.null(neighbourhood.size) == FALSE ){
-    warning('Units of your coordinates might not be kilo meter. \nIf so, the returned EP values are wrong. \nConvert your coordinates into km and re-run.')
-  }
-  
+
   ###################################################################################### 
   ### Calculate EP
   ###################################################################################### 
